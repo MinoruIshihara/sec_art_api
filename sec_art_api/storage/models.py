@@ -1,3 +1,8 @@
 from django.db import models
 
-# Create your models here.
+class Storage(models.Model):
+    name = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Mete:
+        ordering = ['created']

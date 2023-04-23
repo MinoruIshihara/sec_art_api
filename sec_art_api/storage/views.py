@@ -1,5 +1,8 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from rest_framework import viewsets
+from rest_framework import permissions
+from .models import Storage
 
-def index(request):
-    return HttpResponse("Test")
+class StorageViewSet(viewsets.ModelViewSet):
+    queryset = Storage.objects.all().order_by('created')
+#    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
