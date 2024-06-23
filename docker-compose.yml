@@ -1,0 +1,15 @@
+version: "3"
+services:
+  sec-art-api:
+    container_name: sec-art-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sec-art-api
+    volumes:
+      - ./source:/sec_art_api
+    ports:
+      - 8080:8080
+    tty: true
+    stdin_open: true
+    command: ["pipenv", "run", "python", "manage.py", "runserver", "0.0.0.0:8080"]
