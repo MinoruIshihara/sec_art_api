@@ -4,12 +4,30 @@ services:
     container_name: sec-art-api
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./api/Dockerfile
     image: sec-art-api
     volumes:
-      - ./source:/sec_art_api
+      - ./api/source:/sec_art_api
     ports:
       - 8080:8080
     tty: true
     stdin_open: true
+    env_file:
+      - ./.env
+      - ./api/.env
     command: ["pipenv", "run", "python", "manage.py", "runserver", "0.0.0.0:8080"]
+  sec-art-postgres:
+    container_name: sec-art-postgres
+    build:
+      context: .
+      dockerfile: ./postgres/Dockerfile
+    image: sec-art-postgres
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    ports:
+      - 6789:6789
+    tty: true
+    stdin_open: true
+    env_file:
+      - ./.env
+      - ./postgres/.env
