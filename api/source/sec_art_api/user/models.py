@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from typing import Any, Optional
 
 
 def upload_to(instance, filename):
@@ -19,6 +20,15 @@ def upload_to(instance, filename):
 
 def save_stat_to(instance, filename):
     return "ir_server/stat/{filename}".format(filename=filename)
+
+
+@receiver(post_save, sender=sec_art_api.settings.AUTH_USER_MODEL)
+def create_auth_token(
+    sender: str, instance: Optional["User"] = None, created: bool = False, **kwargs: Any
+) -> None:
+    if created and instance is not None:
+        # トークンの作成と紐付け
+        Token.objects.create(user=instance)
 
 
 class UserManager(BaseUserManager):
@@ -46,12 +56,14 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_supervisor", False)
 
-        return self._create_user(
+        user = self._create_user(
             email=email,
             username=username,
             password=password,
             **extra_fields,
         )
+        Token.objects.create(user=user)
+        return user
 
     def create_superuser(self, email, username, password, **extra_fields):
         extra_fields.setdefault("is_active", True)
@@ -76,6 +88,8 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "username"
 
     def has_module_perms(self, ir_server):
         return True
